@@ -25,11 +25,16 @@ public class FinalizarLeilaoService {
 	public void finalizarLeiloesExpirados() {
 		List<Leilao> expirados = leiloes.buscarLeiloesExpirados();
 		expirados.forEach(leilao -> {
-			Lance maiorLance = maiorLanceDadoNoLeilao(leilao);
-			leilao.setLanceVencedor(maiorLance);
+			Lance maiorLance = null;
+			if (leilao.temLances()) {
+				maiorLance = maiorLanceDadoNoLeilao(leilao);
+				leilao.setLanceVencedor(maiorLance);
+			}
 			leilao.fechar();
 			leiloes.salvar(leilao);
-			enviadorDeEmails.enviarEmailVencedorLeilao(maiorLance);
+			if (maiorLance != null) {
+				enviadorDeEmails.enviarEmailVencedorLeilao(maiorLance);
+			}
 		});
 	}
 
