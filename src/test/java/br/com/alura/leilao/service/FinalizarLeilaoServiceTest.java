@@ -81,6 +81,23 @@ class FinalizarLeilaoServiceTest {
 		} catch (Exception e) {}
 	}
 
+
+	@Test
+	void deveriaFinalizarLeilaoSemLancesSemEnviarEmail() {
+		Leilao leilaoSemLances = new Leilao("Notebook", new BigDecimal("1000"), new Usuario("Maria"));
+
+		Mockito.when(leilaoDao.buscarLeiloesExpirados())
+		.thenReturn(java.util.Arrays.asList(leilaoSemLances));
+
+		service.finalizarLeiloesExpirados();
+
+		Assert.assertTrue(leilaoSemLances.isFechado());
+		Assert.assertNull(leilaoSemLances.getLanceVencedor());
+		Mockito.verify(leilaoDao).salvar(leilaoSemLances);
+		Mockito.verifyNoInteractions(enviadorDeEmails);
+	}
+
+
 	private List<Leilao> leiloes() {
 		List<Leilao> lista = new ArrayList<>();
 		
